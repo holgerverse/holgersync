@@ -2,6 +2,6 @@ package main
 
 func main() {
 
-	configLoader()
+	loadConfig("cmd/config_loader.go")
 
 }

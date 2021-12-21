@@ -5,11 +5,35 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type config struct {
 	HolgerSyncConfig struct {
 	}
+}
+
+/*
+	Reads the Holgerfile and returns the config struct
+
+	Input: The path to the directory containing the Holgerfile
+
+	Output: The config struct
+*/
+
+func loadConfig(directoryPath string) {
+
+	// Get the path of the current directory.
+	pwd, _ := os.Getwd()
+
+	// Get the path to the directory containing the Holgerfile. Concatenate the current directory with the directoryPath.
+	holgerfile, err := ioutil.ReadFile(filepath.Join(pwd, directoryPath))
+	if err != nil {
+		log.Fatal("Could not read Holgerfile in Directory: " + filepath.Join(pwd, directoryPath))
+	}
+
+	fmt.Print(holgerfile)
+
 }
 
 func configLoader() {
