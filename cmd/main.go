@@ -65,17 +65,19 @@ func main() {
 
 	arg.MustParse(&args)
 
-	absolutePath, _ := filepath.Abs(args.ModulePath)
+	absolutePath, err := filepath.Abs(args.ModulePath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	switch args.ActionGroup {
-	case "holgerdocs":
+	if args.ActionGroup == "holgerdocs" {
 		temp := (createDocs(absolutePath))
 
-		//Collect existing README content
+		// Collect existing README content
 		existingContent := parseMarkdown(absolutePath + "/README.md")
 		markdownContent := MarkdownContent{Title: existingContent["title"], Description: existingContent["description"], ExampleUsage: existingContent["example_usage"], Variables: temp["variables"], Outputs: temp["outputs"]}
 
-		//Tenplate rendering
+		// Template rendering
 		templateFilePath, err := filepath.Abs("templates/holgerdocs.tmpl")
 		if err != nil {
 			log.Fatal(err)
@@ -135,7 +137,10 @@ func createDocs(hclPath string) map[string][]map[string]string {
 
 	//Iterate all Terraform files and safe the contents in the hclConfig map
 	for _, file := range filesInDirectory(hclPath) {
-		fileContent, _ := os.ReadFile(hclPath + "/" + file.Name())
+		fileContent, err := os.ReadFile(hclPath + "/" + file.Name())
+		if err != nil {
+			log.Fatal(err)
+		}
 		hclConfig[file.Name()] = fileContent
 	}
 
