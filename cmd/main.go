@@ -109,13 +109,13 @@ func filesInDirectory(hclPath string) []fs.FileInfo {
 
 	var terraformFiles []fs.FileInfo
 
-	//Read all files in the terraform directory
+	// Read all files in the terraform directory
 	files, err := ioutil.ReadDir(hclPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//Only safe *.tf files
+	// Only safe *.tf files
 	for _, v := range files {
 		if strings.HasSuffix(v.Name(), ".tf") {
 			terraformFiles = append(terraformFiles, v)
@@ -135,7 +135,7 @@ func createDocs(hclPath string) map[string][]map[string]string {
 
 	c := &Config{}
 
-	//Iterate all Terraform files and safe the contents in the hclConfig map
+	// Iterate all Terraform files and safe the contents in the hclConfig map
 	for _, file := range filesInDirectory(hclPath) {
 		fileContent, err := os.ReadFile(hclPath + "/" + file.Name())
 		if err != nil {
@@ -144,7 +144,7 @@ func createDocs(hclPath string) map[string][]map[string]string {
 		hclConfig[file.Name()] = fileContent
 	}
 
-	//Iterate all file contents
+	// Iterate all file contents
 	for k, v := range hclConfig {
 
 		parsedConfig, diags := hclsyntax.ParseConfig(v, k, hcl.Pos{Line: 1, Column: 1})
@@ -197,21 +197,24 @@ func createDocs(hclPath string) map[string][]map[string]string {
 
 func parseMarkdown(markdownPath string) map[string]string {
 
-	//Read in the content of the existing markdown file
-	fileContent, _ := ioutil.ReadFile(markdownPath)
+	// Read in the content of the existing markdown file
+	fileContent, err := ioutil.ReadFile(markdownPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	results := make(map[string]string)
 
-	//Create custom Markdown parser
+	// Create custom Markdown parser
 	extensions := parser.FencedCode | parser.Tables
 	parser := parser.NewWithExtensions(extensions)
 
-	//Parse Markdown
+	// Parse Markdown
 	temp := markdown.Parse(fileContent, parser)
 
 	for _, child := range temp.AsContainer().Children {
 
-		//Check if the child node is of type Heading
+		// Check if the child node is of type Heading
 		if _, ok := child.(*ast.Heading); ok {
 
 			/*
