@@ -1,9 +1,12 @@
 # {{if .Title}}{{.Title}}{{else}}Please provide a title for your module.{{end}}
 {{if .Description}}{{.Description}}{{else}}Please provide a description for your module.{{end}}
-
+## Table of Contents
+- [Example Usage](#example-usage)
+- [Variables](#variables)
+- [Outputs](#outputs)
 ## Example Usage
 {{.ExampleUsage -}}
-{{ if .Variables}}
+{{ if .Variables -}}
 ## Variables
 | Name | Description | Type | Default | Sensitive |
 |------|-------------|------|---------|-----------|
@@ -11,11 +14,11 @@
 |{{- .name }}|{{- .description }}|{{- .type }}|{{- .default }}|{{- .sensitive }}|
 {{end -}}
 {{end -}}
-{{if .Outputs}}
+{{if .Outputs -}}
 ## Outputs
 | Name | Description | Value | Sensitive |
 |------|-------------|-------|-----------|
 {{range .Outputs -}}
 |{{- .name }}|{{- .description }}|{{- .value }}|{{- .sensitive }}|
-{{end}}
-{{end}}
+{{end -}}
+{{end -}}
