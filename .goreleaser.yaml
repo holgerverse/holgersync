@@ -1,0 +1,20 @@
+---
+project_name: "Holgersync"
+before:
+  hooks:
+    - go mod tidy
+builds:
+  id: "holgersync"
+  dir: cmd
+  main: ./cmd
+  binary: holgersync
+  goos:
+    - linux
+    - windows
+    - darwin
+  goarch:
+    - amd64
+    - arm64
+  goamd64:
+    - v4
+  no_unique_dist_dir: true
