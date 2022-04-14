@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/urfave/cli/v2"
 )
@@ -39,12 +38,7 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							//TODO: Move to helpers
-							absolutePath, err := filepath.Abs(c.String("module-path"))
-							if err != nil {
-								log.Fatal(err)
-							}
-							holgerdocs(absolutePath, "terraform")
+							holgerdocs(absolutePath(c.String("module-path")), "terraform")
 							return nil
 						},
 					},

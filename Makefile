@@ -10,7 +10,7 @@ help:
 
 .PHONY: run-holgerdocs
 run-holgerdocs:
-	go run cmd/main.go holgerdocs --modulepath tests
+	go run cmd/*.go holgerdocs terraform --module-path tests
 
 .PHONY: build-holgersync
 build-holgersync:
