@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strings"
 )
 
@@ -27,4 +28,18 @@ func filesInDirectory(folderPath string, fileSuffix string) []fs.FileInfo {
 	}
 
 	return filteredFiles
+}
+
+/*
+	Return the absolute path of the path specified by path
+*/
+func absolutePath(path string) string {
+	var absolutePath string
+
+	absolutePath, err := filepath.Abs(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return absolutePath
 }
