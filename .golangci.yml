@@ -3,7 +3,6 @@ run:
 linters:
   disable-all: true
   enable:
-    - bodyclose
     - deadcode
     - depguard
     - dogsled
@@ -20,22 +19,12 @@ linters:
     - gomnd
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - lll
     - misspell
     - nakedret
-    - noctx
     - nolintlint
-    - staticcheck
-    - structcheck
-    - stylecheck
     - unconvert
-    - unparam
-    - unused
     - varcheck
     - whitespace
-
-service:
-  analyzed-paths: cmd/

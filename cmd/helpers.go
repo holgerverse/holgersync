@@ -11,7 +11,6 @@ import (
 	Return all files in a directory specified by folderPath that match the fileSuffix
 */
 func filesInDirectory(folderPath string, fileSuffix string) []fs.FileInfo {
-
 	// Stores all files that match the fileSuffix
 	var filteredFiles []fs.FileInfo
 

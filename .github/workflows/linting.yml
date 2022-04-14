@@ -1,34 +1,27 @@
 ---
-name: Lint Code Base
+name: Linting Code Base
 
 on:
   push:
+    tags:
+      - v*
     branches:
       - main
       - dev
   pull_request:
-    branches:
-      - main
-      - dev
 
 jobs:
 
-  super_linter:
-    name: Run Super Linter against Code Base
+  golangci:
+    name: lint
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
-    - name: Lint Code Base
-      uses: github/super-linter@v4
-      env:
-        DEFAULT_BRANCH: main
-        LINTER_RULES_PATH: /
-        VALIDATE_ALL_CODEBASE: false
-        GO_FILE_NAME: .golangci.yml
-        VALIDATE_GO: true
-        VALIDATE_TERRAFORM: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/setup-go@v3
+    - uses: actions/checkout@v3
+
+    - uses: golangci/golangci-lint-action@v3
+      name: golangci-lint
+      with:
+        args: --config .golangci.yml

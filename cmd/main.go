@@ -13,7 +13,6 @@ var args struct {
 }
 
 func main() {
-
 	arg.MustParse(&args)
 
 	absolutePath, err := filepath.Abs(args.ModulePath)
