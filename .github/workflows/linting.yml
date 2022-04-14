@@ -28,7 +28,7 @@ jobs:
         DEFAULT_BRANCH: main
         LINTER_RULES_PATH: /
         VALIDATE_ALL_CODEBASE: false
-        GOLANG_CONFIG_FILE: .golangci.yml
+        GO_FILE_NAME: .golangci.yml
         VALIDATE_GO: true
         VALIDATE_TERRAFORM: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
