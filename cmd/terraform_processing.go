@@ -39,9 +39,7 @@ type Config struct {
 }
 
 func createDocs(hclPath string) map[string][]map[string]string {
-
-	var variables []map[string]string
-	var outputs []map[string]string
+	var variables, outputs []map[string]string
 
 	parsedConfig := make(map[string][]map[string]string)
 	hclConfig := make(map[string][]byte)
@@ -59,7 +57,6 @@ func createDocs(hclPath string) map[string][]map[string]string {
 
 	// Iterate all file contents
 	for k, v := range hclConfig {
-
 		parsedConfig, diags := hclsyntax.ParseConfig(v, k, hcl.Pos{Line: 1, Column: 1})
 		if diags.HasErrors() {
 			log.Fatal(diags)
@@ -72,7 +69,6 @@ func createDocs(hclPath string) map[string][]map[string]string {
 	}
 
 	for _, v := range c.Variables {
-
 		var variableType string
 		var variableDefault string
 
@@ -84,26 +80,16 @@ func createDocs(hclPath string) map[string][]map[string]string {
 			variableDefault = (v.Default.Expr).Variables()[0].RootName()
 		}
 
-		variables = append(variables, map[string]string{
-			"name":        v.Name,
-			"description": v.Description,
-			"sensitive":   strconv.FormatBool(v.Sensitive),
-			"type":        variableType,
-			"default":     variableDefault,
-		})
+		variables = append(variables, map[string]string{"name": v.Name, "description": v.Description,
+			"sensitive": strconv.FormatBool(v.Sensitive), "type": variableType, "default": variableDefault})
 	}
 
 	for _, v := range c.Outputs {
-		outputs = append(outputs, map[string]string{
-			"name":        v.Name,
-			"description": v.Description,
-			"sensitive":   strconv.FormatBool(v.Sensitive),
-			"value":       v.Value,
-		})
+		outputs = append(outputs, map[string]string{"name": v.Name, "description": v.Description,
+			"sensitive": strconv.FormatBool(v.Sensitive), "value": v.Value})
 	}
 
 	parsedConfig["variables"], parsedConfig["outputs"] = variables, outputs
 
 	return parsedConfig
-
 }

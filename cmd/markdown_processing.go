@@ -18,7 +18,6 @@ type MarkdownContent struct {
 }
 
 func parseMarkdown(markdownPath string) map[string]string {
-
 	// Read in the content of the existing markdown file
 	fileContent, err := ioutil.ReadFile(markdownPath)
 	if err != nil {
@@ -35,10 +34,8 @@ func parseMarkdown(markdownPath string) map[string]string {
 	temp := markdown.Parse(fileContent, parser)
 
 	for _, child := range temp.AsContainer().Children {
-
 		// Check if the child node is of type Heading
 		if _, ok := child.(*ast.Heading); ok {
-
 			/*
 			  Copy the heading text and safe it to results if the heading level is 1
 			  Also check if the next node is of type paragraph and safe it to results, it
@@ -63,7 +60,6 @@ func parseMarkdown(markdownPath string) map[string]string {
 					results["example_usage"] = string(exampleUsageCodeBlock.AsLeaf().Literal)
 				}
 			}
-
 		}
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,12 +12,13 @@ import (
 var readmePath string
 
 func holgerdocs(folderPath string, softwareName string) {
-
 	readmePath = folderPath + "/README.md"
 
 	switch softwareName {
 	case "terraform":
 		createDocsForTerraform(folderPath)
+	default:
+		fmt.Println("No documentation available for this software.")
 	}
 }
 
@@ -25,21 +27,21 @@ func holgerdocs(folderPath string, softwareName string) {
 	Call the renderDocs function with specification for Terraform Templates.
 */
 func createDocsForTerraform(folderPath string) {
-
 	// Get the contents from the Terraform Configuration
 	collectedConfig := createDocs(folderPath)
 	// Get the existing content from the README file which is static
 	existingContent := parseMarkdown(readmePath)
 
 	// Create finished Markdown object which holds all data to be rendered
-	markdownContent := MarkdownContent{Title: existingContent["title"], Description: existingContent["description"], ExampleUsage: existingContent["example_usage"], Variables: collectedConfig["variables"], Outputs: collectedConfig["outputs"]}
+	markdownContent := MarkdownContent{Title: existingContent["title"], Description: existingContent["description"],
+		ExampleUsage: existingContent["example_usage"],
+		Variables:    collectedConfig["variables"],
+		Outputs:      collectedConfig["outputs"]}
 
 	renderDocs(folderPath, "templates/holgerdocs_terraform.tmpl", markdownContent)
-
 }
 
 func renderDocs(folderPath string, templatePath string, content MarkdownContent) {
-
 	// Create the absolute path of the template file which is based on the software you want to create your docs from.
 	templateFilePath, err := filepath.Abs(templatePath)
 	if err != nil {
