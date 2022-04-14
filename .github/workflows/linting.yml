@@ -26,6 +26,8 @@ jobs:
       uses: github/super-linter@v4
       env:
         DEFAULT_BRANCH: main
+        VALIDATE_ALL_CODEBASE: false
+        GOLANG_CONFIG_FILE: .golangci.yml
         VALIDATE_GO: true
         VALIDATE_TERRAFORM: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
