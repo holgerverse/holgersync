@@ -36,6 +36,3 @@ linters:
     - unused
     - varcheck
     - whitespace
-
-service:
-  analyzed-paths: cmd/
