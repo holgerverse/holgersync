@@ -31,8 +31,7 @@ func main() {
 	logger := zap.New(core, zap.WithCaller(true), zap.OnFatal(zapcore.CheckWriteAction(3)))
 	defer logger.Sync()
 
-	logger.Info("geiel")
-	logger.Error("shit")
+	logger.Info("Logger initiliazed.")
 
 	app := &cli.App{
 		Name:  "holgersync",

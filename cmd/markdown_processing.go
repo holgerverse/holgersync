@@ -27,7 +27,7 @@ func parseMarkdown(markdownPath string) map[string]string {
 	results := make(map[string]string)
 
 	// Create custom Markdown parser
-	extensions := parser.FencedCode | parser.Tables
+	extensions := parser.FencedCode | parser.Tables | parser.DefinitionLists | parser.CommonExtensions
 	parser := parser.NewWithExtensions(extensions)
 
 	// Parse Markdown
