@@ -23,6 +23,8 @@ github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5y
 github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
 github.com/gomarkdown/markdown v0.0.0-20220310201231-552c6011c0b8 h1:YVvt637ygnOO9qjLBVmPOvrUmCz/i8YECSu/8UlOQW0=
 github.com/gomarkdown/markdown v0.0.0-20220310201231-552c6011c0b8/go.mod h1:JDGcbDT52eL4fju3sZ4TeHGsQwhG9nbDV21aMyhwPoA=
+github.com/gomarkdown/markdown v0.0.0-20220510115730-2372b9aa33e5 h1:mjLaNMRojfgo2qgSdEX1CzmG7rHTeOWZdO1T1sgjEb0=
+github.com/gomarkdown/markdown v0.0.0-20220510115730-2372b9aa33e5/go.mod h1:JDGcbDT52eL4fju3sZ4TeHGsQwhG9nbDV21aMyhwPoA=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.5.7 h1:81/ik6ipDQS2aGcBfIN5dHDB36BwrStyeAQquSYCV4o=
 github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8/DtOE=
