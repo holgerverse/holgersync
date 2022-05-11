@@ -5,37 +5,18 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 func main() {
-
-	// Create Loglevels
-	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zapcore.ErrorLevel
-	})
-	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl < zapcore.ErrorLevel
-	})
-
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	consoleErrors := zapcore.Lock(os.Stderr)
-
-	core := zapcore.NewTee(
-		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
-		zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority),
-	)
-
-	logger := zap.New(core, zap.WithCaller(true), zap.OnFatal(zapcore.CheckWriteAction(3)))
-	defer logger.Sync()
-
-	logger.Info("Logger initiliazed.")
-
 	app := &cli.App{
 		Name:  "holgersync",
 		Usage: "Generate documentation for everything.",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "debug",
+				Usage: "Enable debug mode",
+			},
+		},
 		Commands: []*cli.Command{{
 			Name:     "holgerdocs",
 			Category: "cli-commands",

@@ -32,10 +32,16 @@ type Resource struct {
 	Options hcl.Body `hcl:",remain"`
 }
 
+type Data struct {
+	Name    string   `hcl:"name,label"`
+	Options hcl.Body `hcl:",remain"`
+}
+
 type Config struct {
 	Outputs   []*Output   `hcl:"output,block"`
 	Variables []*Variable `hcl:"variable,block"`
 	Resources []*Resource `hcl:"resource,block"`
+	Data      []*Data     `hcl:"data,block"`
 }
 
 func createDocs(hclPath string) map[string][]map[string]string {
