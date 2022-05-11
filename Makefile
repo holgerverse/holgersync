@@ -7,6 +7,7 @@ help:
 	@echo 'Usage:'
 	@echo '  build-holgersync       - Build the hoglersync application.'
 	@echo '  run-holgerdocs         - Run the holgerdocs subcommand on the test path.'
+	@echo '  act                    - Run all GitHub actions workflows locally. (Requires Act installed)'
 
 .PHONY: run-holgerdocs
 run-holgerdocs:
@@ -15,3 +16,7 @@ run-holgerdocs:
 .PHONY: build-holgersync
 build-holgersync:
 	go build -o holgersync ./...
+
+.PHONY: act
+act:
+	act --workflows ".github/workflows/"
