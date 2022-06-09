@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 type contextKey string
@@ -13,11 +15,26 @@ const (
 	contextSourceFileChecksum contextKey = "sourceFileChecksum"
 )
 
-func calcFileChecksum(configCtx context.Context) [32]byte {
+func getPaths(rootPath string) {
 
-	sum := sha256.Sum256(configCtx.Value(contextSourceFileContext).([]byte))
+	_, err := os.Stat(rootPath)
+	if os.IsNotExist(err) {
+		log.Fatal("Root path does not exist.")
+	}
 
-	return sum
+	err = filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("path: %s\n", path)
+
+		return nil
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
@@ -35,6 +52,6 @@ func sync(path string) {
 	configCtx = context.WithValue(configCtx, contextSourceFileContext, getAbsPathAndReadFile(config.Config.SourceFile))
 	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, calcFileChecksum(configCtx))
 
-	fmt.Print(configCtx.Value(contextSourceFileChecksum))
+	getPaths(config.Config.RootPath)
 
 }

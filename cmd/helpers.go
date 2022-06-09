@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"crypto/sha256"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -21,5 +23,13 @@ func getAbsPathAndReadFile(path string) []byte {
 	}
 
 	return fileContent
+
+}
+
+func calcFileChecksum(configCtx context.Context) [32]byte {
+
+	sum := sha256.Sum256(configCtx.Value(contextSourceFileContext).([]byte))
+
+	return sum
 
 }
