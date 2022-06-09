@@ -1,0 +1,5 @@
+config:
+  sourceFile: tests/test.json
+  rootPath: "tests/"
+  depth: 0
+  file: testing.json
