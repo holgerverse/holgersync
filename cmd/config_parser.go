@@ -10,8 +10,7 @@ type holgersyncConfig struct {
 	Config struct {
 		SourceFile string `yaml:"sourceFile"`
 		RootPath   string `yaml:"rootPath"`
-		Depth      int64
-		File       string
+		FileRegex  string `yaml:"fileRegex"`
 	}
 }
 

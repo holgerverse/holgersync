@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 type contextKey string
@@ -15,10 +16,11 @@ const (
 	contextSourceFileChecksum contextKey = "sourceFileChecksum"
 )
 
-func getPaths(rootPath string) {
+func getPaths(rootPath string, fileRegex string) {
 
 	_, err := os.Stat(rootPath)
 	if os.IsNotExist(err) {
+
 		log.Fatal("Root path does not exist.")
 	}
 
@@ -27,7 +29,14 @@ func getPaths(rootPath string) {
 			return err
 		}
 
-		fmt.Printf("path: %s\n", path)
+		r, err := regexp.Compile(fileRegex)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if r.MatchString(info.Name()) {
+			fmt.Print(info.Name())
+		}
 
 		return nil
 	})
@@ -52,6 +61,6 @@ func sync(path string) {
 	configCtx = context.WithValue(configCtx, contextSourceFileContext, getAbsPathAndReadFile(config.Config.SourceFile))
 	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, calcFileChecksum(configCtx))
 
-	getPaths(config.Config.RootPath)
+	getPaths(config.Config.RootPath, config.Config.FileRegex)
 
 }
