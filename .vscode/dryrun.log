@@ -1,9 +1,0 @@
-make --dry-run --always-make --keep-going --print-directory
-make: Entering directory `/Users/nilscarstensen/go/src/github.com/holgerverse/holgersync'
-echo 'Makefile for "holgersync" development.'
-echo ''
-echo 'Usage:'
-echo '  build-holgersync       - Build the hoglersync application.'
-echo '  run-holgerdocs         - Run the holgerdocs subcommand on the test path.'
-make: Leaving directory `/Users/nilscarstensen/go/src/github.com/holgerverse/holgersync'
- 
