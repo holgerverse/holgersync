@@ -1,14 +1,13 @@
 package main
 
 import (
-	"context"
 	"crypto/sha256"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 )
 
-func getAbsPathAndReadFile(path string) []byte {
+func getAbsPathAndReadFile(path string) string {
 
 	// Create absolute path to config file
 	absFilePath, err := filepath.Abs(path)
@@ -22,13 +21,13 @@ func getAbsPathAndReadFile(path string) []byte {
 		log.Fatal(err)
 	}
 
-	return fileContent
+	return string(fileContent)
 
 }
 
-func calcFileChecksum(configCtx context.Context) [32]byte {
+func calcFileChecksum(path string) [32]byte {
 
-	sum := sha256.Sum256(configCtx.Value(contextSourceFileContext).([]byte))
+	sum := sha256.Sum256([]byte(getAbsPathAndReadFile(path)))
 
 	return sum
 

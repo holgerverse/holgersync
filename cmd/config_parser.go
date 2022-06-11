@@ -18,7 +18,7 @@ func (c *holgersyncConfig) readConfig(path string) *holgersyncConfig {
 
 	configFile := getAbsPathAndReadFile(path)
 
-	err := yaml.Unmarshal(configFile, c)
+	err := yaml.Unmarshal([]byte(configFile), c)
 	if err != nil {
 		log.Fatal(err)
 	}
