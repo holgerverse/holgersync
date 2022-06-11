@@ -10,7 +10,7 @@ help:
 
 .PHONY: run-holgersync
 run-holgerdocs:
-	go run cmd/*.go sync
+	go run cmd/*.go
 
 .PHONY: build-holgersync
 build-holgersync:

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func getAbsPathAndReadFile(path string) string {
+func GetAbsPathAndReadFile(path string) string {
 
 	// Create absolute path to config file
 	absFilePath, err := filepath.Abs(path)
@@ -25,9 +25,9 @@ func getAbsPathAndReadFile(path string) string {
 
 }
 
-func calcFileChecksum(path string) [32]byte {
+func CalcFileChecksum(path string) [32]byte {
 
-	sum := sha256.Sum256([]byte(getAbsPathAndReadFile(path)))
+	sum := sha256.Sum256([]byte(GetAbsPathAndReadFile(path)))
 
 	return sum
 

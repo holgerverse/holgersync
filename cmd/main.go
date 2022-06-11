@@ -1,26 +1,15 @@
 package main
 
 import (
-	"os"
+	"log"
 
-	"github.com/urfave/cli/v2"
+	"github.com/holgerverse/holgersync/commands"
 )
 
 func main() {
 
-	app := &cli.App{
-		Name:  "holgersync",
-		Usage: "Synchronize files between everything",
-		Commands: []*cli.Command{{
-			Name:  "sync",
-			Usage: "Synchronize based on configuration",
-			Action: func(c *cli.Context) error {
-				sync("tests/holgersyncfile.yml")
-				return nil
-			},
-		}},
+	err := commands.Execute()
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	app.Run(os.Args)
-
 }

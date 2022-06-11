@@ -1,4 +1,4 @@
-package main
+package synchronize
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/holgerverse/holgersync/pkg/helpers"
 )
 
 type contextKey string
@@ -42,7 +44,7 @@ func updateFile(rootPath string, path string, ctx context.Context) error {
 
 }
 
-func getPaths(rootPath string, fileRegex string, ctx context.Context) error {
+func GetPaths(rootPath string, fileRegex string, ctx context.Context) error {
 
 	// Check if the root path is exists
 	_, err := os.Stat(rootPath)
@@ -68,7 +70,7 @@ func getPaths(rootPath string, fileRegex string, ctx context.Context) error {
 		}
 
 		//Calculate the checksum of the file
-		checksum := calcFileChecksum(path)
+		checksum := helpers.CalcFileChecksum(path)
 
 		if checksum != ctx.Value(contextSourceFileChecksum) {
 			log.Printf("File %s does not match the source file.\n", path)
@@ -84,7 +86,7 @@ func getPaths(rootPath string, fileRegex string, ctx context.Context) error {
 	return err
 }
 
-func sync(path string) {
+func Sync(path string) {
 
 	// Create a new hoglersyncConfig object
 	config := &holgersyncConfig{}
@@ -95,10 +97,10 @@ func sync(path string) {
 	// Read the content of the given holgersync config file
 	config.readConfig(path)
 
-	configCtx = context.WithValue(configCtx, contextSourceFileContent, getAbsPathAndReadFile(config.Config.SourceFile))
-	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, calcFileChecksum(config.Config.SourceFile))
+	configCtx = context.WithValue(configCtx, contextSourceFileContent, helpers.GetAbsPathAndReadFile(config.Config.SourceFile))
+	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, helpers.CalcFileChecksum(config.Config.SourceFile))
 
-	err := getPaths(config.Config.RootPath, config.Config.FileRegex, configCtx)
+	err := GetPaths(config.Config.RootPath, config.Config.FileRegex, configCtx)
 	if err != nil {
 		log.Fatal(err)
 	}
