@@ -2,4 +2,3 @@
 [![GitHub Super-Linter](https://github.com/holgerverse/holgersync/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 # holgersync
 
-TODO: Move holgersync fiel to Viper imports
