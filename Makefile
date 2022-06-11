@@ -6,11 +6,11 @@ help:
 	@echo ''
 	@echo 'Usage:'
 	@echo '  build-holgersync       - Build the hoglersync application.'
-	@echo '  run-holgerdocs         - Run the holgerdocs subcommand on the test path.'
+	@echo '  run-holgersync         - Run the holgersync subcommand on the test path.'
 
-.PHONY: run-holgerdocs
+.PHONY: run-holgersync
 run-holgerdocs:
-	go run cmd/*.go holgerdocs terraform --module-path tests
+	go run cmd/*.go sync
 
 .PHONY: build-holgersync
 build-holgersync:
