@@ -5,10 +5,10 @@ help:
 	@echo 'Makefile for "holgersync" development.'
 	@echo ''
 	@echo 'Usage:'
-	@echo '  run-holgersync-test    - Run the devolpment command for holgersync development purpose.'
-	@echo '  build-holgersync       - Build the hoglersync application.'
+	@echo '  run-holgersync-development    - Run the devolpment command for holgersync development purpose.'
+	@echo '  build-holgersync              - Build the hoglersync application.'
 
-.PHONY: run-development
+.PHONY: run-holgersync-development
 run-sync-development:
 	go run cmd/main.go sync --debug --log-to-file="holgersync.log"
 

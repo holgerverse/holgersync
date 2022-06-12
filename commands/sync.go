@@ -9,10 +9,12 @@ import (
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
+	syncCmd.Flags().StringVarP(&holgersyncConfigPath, "config-file", "c", "./holgersyncfile.yaml", "Path to the holgersync config file")
 }
 
 var (
-	syncCmd = &cobra.Command{
+	holgersyncConfigPath string
+	syncCmd              = &cobra.Command{
 		Use:   "sync",
 		Short: "Synchronize files between everything via CLI",
 		Long:  ``,

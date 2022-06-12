@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/holgerverse/holgersync/commands"
+	"github.com/holgerverse/holgersync/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -25,14 +25,15 @@ type Logger interface {
 }
 
 type CmdLogger struct {
+	cfg         *config.Config
 	sugarLogger *zap.SugaredLogger
 }
 
-func NewCmdLogger() *CmdLogger {
+func NewCmdLogger(cfg *config.Config) *CmdLogger {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	return &CmdLogger{}
+	return &CmdLogger{cfg: cfg}
 }
 
 // LoggerLevelMap maps the log level to the zapcore.Level
@@ -58,10 +59,10 @@ func (l *CmdLogger) getLoggerLevel(logLevel string) zapcore.Level {
 
 }
 
-func (l *CmdLogger) InitLogger(loggerConfig map[string]string) {
+func (l *CmdLogger) InitLogger() {
 
 	// Check wether the log level is valid and then set it, if not correct set debug as default
-	logLevel := l.getLoggerLevel(loggerConfig["level"])
+	logLevel := l.getLoggerLevel(l.cfg.Logger.Level)
 
 	// Create a new encoder config for the logger and define default values
 	encoder := zap.NewProductionEncoderConfig()
@@ -72,7 +73,7 @@ func (l *CmdLogger) InitLogger(loggerConfig map[string]string) {
 	fileEncoder := zapcore.NewJSONEncoder(encoder)
 
 	// Create the log file
-	logFile, err := os.Create(commands.LogToFile)
+	logFile, err := os.Create(l.cfg.Logger.Destination)
 	if err != nil {
 		log.Fatal("Could not create log file")
 	}
