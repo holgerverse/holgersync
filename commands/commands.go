@@ -3,12 +3,14 @@ package commands
 import "github.com/spf13/cobra"
 
 func init() {
-	rootCmd.Flags().BoolVar(&Debug, "debug", false, "Enable debug mode")
+	rootCmd.PersistentFlags().BoolVar(&Debug, "debug", false, "Enable debug mode")
+	rootCmd.PersistentFlags().StringVar(&LogToFile, "log-to-file", "", "Safe logs to file")
 }
 
 var (
-	Debug   bool
-	rootCmd = &cobra.Command{
+	Debug     bool
+	LogToFile string
+	rootCmd   = &cobra.Command{
 		Use:           "holgersync",
 		Short:         "holgersync - Synchronize files between everything",
 		Long:          ``,
