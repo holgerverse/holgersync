@@ -2,10 +2,11 @@ package synchronize
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/holgerverse/holgersync/config"
@@ -45,45 +46,6 @@ func updateFile(rootPath string, path string, ctx context.Context) error {
 
 }
 
-func GetPaths(rootPath string, fileRegex string, ctx context.Context) error {
-
-	// Check if the root path is exists
-	_, err := os.Stat(rootPath)
-	if os.IsNotExist(err) {
-		return err
-	}
-
-	// Walk through the root path
-	err = filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
-
-		// Catch errors
-		if err != nil {
-			return err
-		}
-
-		r, err := regexp.Compile(fileRegex)
-		if err != nil {
-			return err
-		}
-
-		if !r.MatchString(info.Name()) {
-			return err
-		}
-
-		// if checksum != ctx.Value(contextSourceFileChecksum) {
-		// 	log.Printf("File %s does not match the source file.\n", path)
-		// 	err = updateFile(rootPath, path, ctx)
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		// }
-
-		return nil
-	})
-
-	return err
-}
-
 // Entrypoint for the synchronize command
 func Sync(cfg *config.Config) {
 
@@ -105,4 +67,15 @@ func Sync(cfg *config.Config) {
 		logger.Fatal(err)
 	}
 	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, sourceFileChecksum)
+
+	for _, target := range cfg.HolgersyncConfig.Targets {
+
+		logger.Debugf("Processing target: %s", target.Path)
+		targetFilePath := fmt.Sprintf("%s/%s", target.Path, filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath))
+
+		if _, err := os.Stat(target.Path + "/" + filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath)); errors.Is(err, os.ErrNotExist) {
+			logger.Debugf("%s does not exist. Copying source content", targetFilePath)
+			os.WriteFile(targetFilePath, sourceFileContent, 0644)
+		}
+	}
 }
