@@ -67,7 +67,6 @@ func (l *CmdLogger) InitLogger() {
 	// Create a new encoder config for the logger and define default values
 	encoder := zap.NewProductionEncoderConfig()
 	encoder.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoder.CallerKey = "caller"
 
 	// Create encoders
 	consoleEncoder := zapcore.NewConsoleEncoder(encoder)
@@ -86,7 +85,7 @@ func (l *CmdLogger) InitLogger() {
 	)
 
 	// Apply cores to the logger
-	logger := zap.New(core)
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	// Pass configuration to the logger
 	l.sugarLogger = logger.Sugar()
