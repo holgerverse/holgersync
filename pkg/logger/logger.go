@@ -29,7 +29,7 @@ type CmdLogger struct {
 	sugarLogger *zap.SugaredLogger
 }
 
-func NewCmdLogger(cfg *config.Config) *CmdLogger {
+func NewCliLogger(cfg *config.Config) *CmdLogger {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
@@ -85,7 +85,7 @@ func (l *CmdLogger) InitLogger() {
 	)
 
 	// Apply cores to the logger
-	logger := zap.New(core)
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	// Pass configuration to the logger
 	l.sugarLogger = logger.Sugar()

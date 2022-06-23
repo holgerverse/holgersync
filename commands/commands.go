@@ -4,7 +4,7 @@ import "github.com/spf13/cobra"
 
 func init() {
 	rootCmd.PersistentFlags().BoolVar(&Debug, "debug", false, "Enable debug mode")
-	rootCmd.PersistentFlags().StringVar(&LogToFile, "log-to-file", "", "Safe logs to file")
+	rootCmd.PersistentFlags().StringVar(&LogToFile, "log-to-file", "123", "Safe logs to file")
 }
 
 var (

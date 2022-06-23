@@ -3,32 +3,36 @@ package helpers
 import (
 	"crypto/sha256"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 )
 
-func GetAbsPathAndReadFile(path string) string {
+func GetAbsPathAndReadFile(path string) ([]byte, error) {
 
 	// Create absolute path to config file
 	absFilePath, err := filepath.Abs(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// Read Config File
 	fileContent, err := ioutil.ReadFile(absFilePath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return string(fileContent)
+	return fileContent, nil
 
 }
 
-func CalcFileChecksum(path string) [32]byte {
+func CalcFileChecksum(path string) ([]byte, error) {
 
-	sum := sha256.Sum256([]byte(GetAbsPathAndReadFile(path)))
+	data, err := GetAbsPathAndReadFile(path)
+	if err != nil {
+		return nil, err
+	}
 
-	return sum
+	sum := sha256.Sum256(data)
+
+	return sum[:], nil
 
 }

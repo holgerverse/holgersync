@@ -3,13 +3,14 @@ package commands
 import (
 	"log"
 
+	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/synchronize"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-	syncCmd.Flags().StringVarP(&holgersyncConfigPath, "config-file", "c", "./holgersyncfile.yaml", "Path to the holgersync config file")
+	syncCmd.Flags().StringVarP(&holgersyncConfigPath, "config-file", "c", "./holgersyncfile.yml", "Path to the holgersync config file")
 }
 
 var (
@@ -24,10 +25,22 @@ var (
 
 func commandSync(ccmd *cobra.Command, args []string) {
 
-	if len(args) > 0 {
-		synchronize.Sync(args[0])
-	} else {
-		log.Fatalf("%s", "Please provide a path to the config file.")
+	// Read the Holgersync configuration file
+	cfgFile, err := config.LoadConfig(holgersyncConfigPath)
+	if err != nil {
+		log.Fatalln("No Holgersync configuration file found in this directory.")
 	}
 
+	// Parse Holgersync config
+	cfg := config.ParseConfig(cfgFile)
+
+	if Debug {
+		cfg.Logger.Level = "debug"
+	} else {
+		cfg.Logger.Level = "error"
+	}
+
+	cfg.Logger.Destination = LogToFile
+
+	synchronize.Sync(cfg)
 }

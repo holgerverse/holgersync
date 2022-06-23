@@ -12,6 +12,14 @@ type Config struct {
 }
 
 type HolgersyncConfig struct {
+	TestingConfig TestingConfig `yaml:"testingConfig"`
+	Cool          string
+}
+
+type TestingConfig struct {
+	SourceFile string `yaml:"sourceFile"`
+	RootPath   string `yaml:"rootPath"`
+	FileRegex  string `yaml:"fileRegex"`
 }
 
 type Logger struct {
@@ -20,18 +28,18 @@ type Logger struct {
 }
 
 // Load the holgersync config file
-func LoadConfig(filename string) *viper.Viper {
+func LoadConfig(filename string) (*viper.Viper, error) {
 
 	v := viper.New()
 
-	v.SetConfigFile("holgersync.yaml")
+	v.SetConfigFile(filename)
 	v.SetConfigType("yaml")
 
 	if err := v.ReadInConfig(); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return v
+	return v, nil
 }
 
 // TODO

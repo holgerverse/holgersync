@@ -1,0 +1,2 @@
+2022-06-12T22:23:18.925+0200	debug	Logger initialized
+2022-06-12T22:23:18.925+0200	fatal	read /Users/nilscarstensen/go/src/github.com/holgerverse/holgersync: is a directory
