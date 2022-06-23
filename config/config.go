@@ -28,7 +28,7 @@ type Logger struct {
 }
 
 // Load the holgersync config file
-func LoadConfig(filename string) *viper.Viper {
+func LoadConfig(filename string) (*viper.Viper, error) {
 
 	v := viper.New()
 
@@ -36,10 +36,10 @@ func LoadConfig(filename string) *viper.Viper {
 	v.SetConfigType("yaml")
 
 	if err := v.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %v", err)
+		return nil, err
 	}
 
-	return v
+	return v, nil
 }
 
 // TODO

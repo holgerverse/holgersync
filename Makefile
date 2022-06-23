@@ -10,7 +10,8 @@ help:
 
 .PHONY: run-holgersync-development
 run-sync-development:
-	go run cmd/main.go sync --debug --log-to-file="holgersync.log"
+	go run cmd/main.go sync --debug --log-to-file="holgersync.log" \
+		--config-file="./tests/holgersyncfile.yml"
 
 .PHONY: build-holgersync
 build-holgersync:

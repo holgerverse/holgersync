@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/synchronize"
@@ -25,10 +25,14 @@ var (
 
 func commandSync(ccmd *cobra.Command, args []string) {
 
-	cfgFile := config.LoadConfig(holgersyncConfigPath)
+	// Read the Holgersync configuration file
+	cfgFile, err := config.LoadConfig(holgersyncConfigPath)
+	if err != nil {
+		log.Fatalln("No Holgersync configuration file found in this directory.")
+	}
+
+	// Parse Holgersync config
 	cfg := config.ParseConfig(cfgFile)
-	fmt.Printf("%s", cfg.HolgersyncConfig.Cool)
-	fmt.Println("test123")
 
 	if Debug {
 		cfg.Logger.Level = "debug"
@@ -39,5 +43,4 @@ func commandSync(ccmd *cobra.Command, args []string) {
 	cfg.Logger.Destination = LogToFile
 
 	synchronize.Sync(cfg)
-
 }
