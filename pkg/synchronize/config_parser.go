@@ -1,8 +1,6 @@
 package synchronize
 
 import (
-	"log"
-
 	"github.com/holgerverse/holgersync/pkg/helpers"
 	"gopkg.in/yaml.v2"
 )
@@ -15,14 +13,17 @@ type holgersyncConfig struct {
 	}
 }
 
-func (c *holgersyncConfig) readConfig(path string) *holgersyncConfig {
+func (c *holgersyncConfig) readConfig(path string) (*holgersyncConfig, error) {
 
-	configFile := helpers.GetAbsPathAndReadFile(path)
-
-	err := yaml.Unmarshal([]byte(configFile), c)
+	configFile, err := helpers.GetAbsPathAndReadFile(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return c
+	err = yaml.Unmarshal([]byte(configFile), c)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }

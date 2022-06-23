@@ -29,7 +29,7 @@ type CmdLogger struct {
 	sugarLogger *zap.SugaredLogger
 }
 
-func NewCmdLogger(cfg *config.Config) *CmdLogger {
+func NewCliLogger(cfg *config.Config) *CmdLogger {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
@@ -67,6 +67,7 @@ func (l *CmdLogger) InitLogger() {
 	// Create a new encoder config for the logger and define default values
 	encoder := zap.NewProductionEncoderConfig()
 	encoder.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoder.CallerKey = "caller"
 
 	// Create encoders
 	consoleEncoder := zapcore.NewConsoleEncoder(encoder)

@@ -1,4 +1,6 @@
-config:
+testingConfig:
   sourceFile: tests/test.json
   rootPath: "tests/"
   fileRegex: testing.json
+
+Cool: test
