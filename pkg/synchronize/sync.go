@@ -2,11 +2,9 @@ package synchronize
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strings"
 
@@ -72,15 +70,6 @@ func GetPaths(rootPath string, fileRegex string, ctx context.Context) error {
 			return err
 		}
 
-		//Calculate the checksum of the file
-		checksum, err := helpers.CalcFileChecksum(path)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(reflect.TypeOf(checksum))
-		fmt.Println(reflect.TypeOf(ctx.Value(contextSourceFileChecksum)))
-
 		// if checksum != ctx.Value(contextSourceFileChecksum) {
 		// 	log.Printf("File %s does not match the source file.\n", path)
 		// 	err = updateFile(rootPath, path, ctx)
@@ -97,30 +86,23 @@ func GetPaths(rootPath string, fileRegex string, ctx context.Context) error {
 
 // Entrypoint for the synchronize command
 func Sync(cfg *config.Config) {
+
 	logger := logger.NewCliLogger(cfg)
 	logger.InitLogger()
 	logger.Debug("Logger initialized")
 
 	configCtx := context.TODO()
 
-	fmt.Println(cfg.HolgersyncConfig)
-	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.TestingConfig.SourceFile)
+	// Read the content of the root file
+	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.SourceFileConfig.FilePath)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.Debug("Source file red")
-
 	configCtx = context.WithValue(configCtx, contextSourceFileContent, sourceFileContent)
 
-	sourceFileChecksum, err := helpers.CalcFileChecksum(cfg.HolgersyncConfig.TestingConfig.SourceFile)
+	sourceFileChecksum, err := helpers.CalcFileChecksum(sourceFileContent)
 	if err != nil {
 		logger.Fatal(err)
 	}
-
 	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, sourceFileChecksum)
-
-	err = GetPaths(cfg.HolgersyncConfig.TestingConfig.RootPath, cfg.HolgersyncConfig.TestingConfig.FileRegex, configCtx)
-	if err != nil {
-		logger.Fatal(err)
-	}
 }
