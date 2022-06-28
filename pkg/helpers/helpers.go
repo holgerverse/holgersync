@@ -24,12 +24,7 @@ func GetAbsPathAndReadFile(path string) ([]byte, error) {
 
 }
 
-func CalcFileChecksum(path string) ([]byte, error) {
-
-	data, err := GetAbsPathAndReadFile(path)
-	if err != nil {
-		return nil, err
-	}
+func CalcFileChecksum(data []byte) ([]byte, error) {
 
 	sum := sha256.Sum256(data)
 

@@ -3,4 +3,3 @@
 # Holgersync
 
 The Holgersync synchronizes templated files between multiple backends.
-

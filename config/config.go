@@ -12,14 +12,24 @@ type Config struct {
 }
 
 type HolgersyncConfig struct {
-	TestingConfig TestingConfig `yaml:"testingConfig"`
-	Cool          string
+	SourceFileConfig SourceFileConfig `yaml:"sourceFileConfig"`
+	Targets          []Target         `yaml:"Targets,mapstructure"`
 }
 
-type TestingConfig struct {
-	SourceFile string `yaml:"sourceFile"`
-	RootPath   string `yaml:"rootPath"`
-	FileRegex  string `yaml:"fileRegex"`
+type SourceFileConfig struct {
+	FilePath  string `yaml:"filePath"`
+	RootPath  string `yaml:"rootPath"`
+	FileRegex string `yaml:"fileRegex"`
+}
+
+type Target struct {
+	Path       string      `yaml:"path"`
+	Parameters []Parameter `yaml:"parameters,mapstructure"`
+}
+
+type Parameter struct {
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
 }
 
 type Logger struct {

@@ -1,6 +1,6 @@
-testingConfig:
-  sourceFile: tests/test.json
-  rootPath: "tests/"
-  fileRegex: testing.json
+HolgersyncConfig:
+  SourceFileConfig:
+    filePath: tests/test.json
 
-Cool: test
+  Targets:
+  - path: tests/test_folder1

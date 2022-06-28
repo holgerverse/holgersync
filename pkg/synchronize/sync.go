@@ -1,18 +1,19 @@
 package synchronize
 
 import (
+	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"reflect"
-	"regexp"
 	"strings"
 
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/helpers"
 	"github.com/holgerverse/holgersync/pkg/logger"
+	"github.com/holgerverse/holgersync/pkg/remotes"
 )
 
 type contextKey string
@@ -47,80 +48,70 @@ func updateFile(rootPath string, path string, ctx context.Context) error {
 
 }
 
-func GetPaths(rootPath string, fileRegex string, ctx context.Context) error {
-
-	// Check if the root path is exists
-	_, err := os.Stat(rootPath)
-	if os.IsNotExist(err) {
-		return err
-	}
-
-	// Walk through the root path
-	err = filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
-
-		// Catch errors
-		if err != nil {
-			return err
-		}
-
-		r, err := regexp.Compile(fileRegex)
-		if err != nil {
-			return err
-		}
-
-		if !r.MatchString(info.Name()) {
-			return err
-		}
-
-		//Calculate the checksum of the file
-		checksum, err := helpers.CalcFileChecksum(path)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(reflect.TypeOf(checksum))
-		fmt.Println(reflect.TypeOf(ctx.Value(contextSourceFileChecksum)))
-
-		// if checksum != ctx.Value(contextSourceFileChecksum) {
-		// 	log.Printf("File %s does not match the source file.\n", path)
-		// 	err = updateFile(rootPath, path, ctx)
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		// }
-
-		return nil
-	})
-
-	return err
-}
-
 // Entrypoint for the synchronize command
 func Sync(cfg *config.Config) {
+
 	logger := logger.NewCliLogger(cfg)
 	logger.InitLogger()
 	logger.Debug("Logger initialized")
 
 	configCtx := context.TODO()
 
-	fmt.Println(cfg.HolgersyncConfig)
-	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.TestingConfig.SourceFile)
+	// Read the content of the root file
+	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.SourceFileConfig.FilePath)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.Debug("Source file red")
-
 	configCtx = context.WithValue(configCtx, contextSourceFileContent, sourceFileContent)
 
-	sourceFileChecksum, err := helpers.CalcFileChecksum(cfg.HolgersyncConfig.TestingConfig.SourceFile)
+	sourceFileChecksum, err := helpers.CalcFileChecksum(sourceFileContent)
 	if err != nil {
 		logger.Fatal(err)
 	}
-
 	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, sourceFileChecksum)
 
-	err = GetPaths(cfg.HolgersyncConfig.TestingConfig.RootPath, cfg.HolgersyncConfig.TestingConfig.FileRegex, configCtx)
-	if err != nil {
-		logger.Fatal(err)
+	// Iterate over all targets
+	for _, target := range cfg.HolgersyncConfig.Targets {
+
+		logger.Debugf("Processing target: %s", target.Path)
+		targetFilePath := fmt.Sprintf("%s/%s", target.Path, filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath))
+
+		if _, err := os.Stat(target.Path + "/" + filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath)); errors.Is(err, os.ErrNotExist) {
+			logger.Debugf("%s does not exist. Copying source content", targetFilePath)
+			os.WriteFile(targetFilePath, sourceFileContent, 0644)
+		}
+
+		sourceSha256, err := helpers.CalcFileChecksum(sourceFileContent)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		targetContent, err := helpers.GetAbsPathAndReadFile(targetFilePath)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		targetSha256, err := helpers.CalcFileChecksum(targetContent)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		res := bytes.Compare(sourceSha256, targetSha256)
+		if res != 0 {
+			logger.Debugf("%s has changed. Updating", targetFilePath)
+			os.WriteFile(targetFilePath, sourceFileContent, 0644)
+		}
+
+		// Create new branch
+		err = remotes.CreateNewBranch(target.Path)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		err = remotes.CommitAndPush(target.Path, "test.json")
+		if err != nil {
+			logger.Fatal(err)
+		}
+
 	}
 }
