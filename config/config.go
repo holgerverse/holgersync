@@ -23,7 +23,13 @@ type SourceFileConfig struct {
 }
 
 type Target struct {
-	Path string `yaml:"path"`
+	Path       string      `yaml:"path"`
+	Parameters []Parameter `yaml:"parameters,mapstructure"`
+}
+
+type Parameter struct {
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
 }
 
 type Logger struct {
