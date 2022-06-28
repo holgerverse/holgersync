@@ -7,6 +7,7 @@ help:
 	@echo 'Usage:'
 	@echo '  run-holgersync-development    - Run the devolpment command for holgersync development purpose.'
 	@echo '  build-holgersync              - Build the hoglersync application.'
+	@echo '  go-get-dependencies           - Get the dependencies for the holgersync application.'
 
 .PHONY: run-holgersync-development
 run-sync-development:
@@ -16,3 +17,7 @@ run-sync-development:
 .PHONY: build-holgersync
 build-holgersync:
 	go build -o holgersync ./...
+
+.PHONY: go-get-dependencies
+go-get-dependencies:
+	go mod tidy
