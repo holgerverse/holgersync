@@ -4,4 +4,3 @@ HolgersyncConfig:
 
   Targets:
   - path: tests/test_folder1
-  - path: tests/test_folder2
