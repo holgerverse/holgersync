@@ -1,6 +1,7 @@
 package synchronize
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/helpers"
 	"github.com/holgerverse/holgersync/pkg/logger"
+	"github.com/holgerverse/holgersync/pkg/remotes"
 )
 
 type contextKey string
@@ -68,6 +70,7 @@ func Sync(cfg *config.Config) {
 	}
 	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, sourceFileChecksum)
 
+	// Iterate over all targets
 	for _, target := range cfg.HolgersyncConfig.Targets {
 
 		logger.Debugf("Processing target: %s", target.Path)
@@ -77,5 +80,38 @@ func Sync(cfg *config.Config) {
 			logger.Debugf("%s does not exist. Copying source content", targetFilePath)
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
+
+		sourceSha256, err := helpers.CalcFileChecksum(sourceFileContent)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		targetContent, err := helpers.GetAbsPathAndReadFile(targetFilePath)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		targetSha256, err := helpers.CalcFileChecksum(targetContent)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		res := bytes.Compare(sourceSha256, targetSha256)
+		if res != 0 {
+			logger.Debugf("%s has changed. Updating", targetFilePath)
+			os.WriteFile(targetFilePath, sourceFileContent, 0644)
+		}
+
+		// Create new branch
+		err = remotes.CreateNewBranch(target.Path)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		err = remotes.CommitAndPush(target.Path, "test.json")
+		if err != nil {
+			logger.Fatal(err)
+		}
+
 	}
 }
