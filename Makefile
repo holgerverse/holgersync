@@ -8,6 +8,7 @@ help:
 	@echo '  run-holgersync-development    - Run the devolpment command for holgersync development purpose.'
 	@echo '  build-holgersync              - Build the hoglersync application.'
 	@echo '  go-get-dependencies           - Get the dependencies for the holgersync application.'
+	@echo '  clean-tests				   - Clean all files created by tests.'
 
 .PHONY: run-holgersync-development
 run-sync-development:
@@ -21,3 +22,7 @@ build-holgersync:
 .PHONY: go-get-dependencies
 go-get-dependencies:
 	go mod tidy
+
+.PHONY: clean-tests
+clean-tests:
+	find -f tests/test_folder* | xargs rm -rf
