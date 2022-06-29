@@ -25,6 +25,7 @@ func GetAbsPathAndReadFile(path string) ([]byte, error) {
 
 }
 
+// Takes to strings and returns true if they are the same
 func CompareData(source []byte, target []byte) (bool, error) {
 
 	sourceSha256, err := CalcFileChecksum(source)

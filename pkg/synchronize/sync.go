@@ -1,10 +1,9 @@
 package synchronize
 
 import (
-	"bytes"
-	"context"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -44,20 +43,11 @@ func Sync(cfg *config.Config) {
 	logger.InitLogger()
 	logger.Debug("Logger initialized")
 
-	configCtx := context.TODO()
-
 	// Read the content of the root file
 	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.SourceFileConfig.FilePath)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	configCtx = context.WithValue(configCtx, contextSourceFileContent, sourceFileContent)
-
-	sourceFileChecksum, err := helpers.CalcFileChecksum(sourceFileContent)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, sourceFileChecksum)
 
 	// Iterate over all targets
 	for _, target := range cfg.HolgersyncConfig.Targets {
@@ -70,30 +60,18 @@ func Sync(cfg *config.Config) {
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
 
-		sourceSha256, err := helpers.CalcFileChecksum(sourceFileContent)
-		if err != nil {
-			logger.Fatal(err)
-		}
-
 		targetContent, err := helpers.GetAbsPathAndReadFile(targetFilePath)
 		if err != nil {
 			logger.Fatal(err)
 		}
 
-		targetSha256, err := helpers.CalcFileChecksum(targetContent)
+		result, err := helpers.CompareData(sourceFileContent, targetContent)
 		if err != nil {
-			logger.Fatal(err)
+			log.Fatal(err)
 		}
-
-		res := bytes.Compare(sourceSha256, targetSha256)
-		if res != 0 {
+		if !result {
 			logger.Debugf("%s has changed. Updating", targetFilePath)
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
-
-		fmt.Println(filepath.Base(targetFilePath))
-
-		fmt.Println(os.Stat(targetFilePath))
-
 	}
 }
