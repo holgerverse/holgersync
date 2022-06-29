@@ -5,10 +5,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/helpers"
@@ -23,28 +21,19 @@ const (
 	contextSourceFileChecksum contextKey = "sourceFileChecksum"
 )
 
-func updateFile(rootPath string, path string, ctx context.Context) error {
+func pushToBackend(path string) error {
 
-	in, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	stringReader := strings.NewReader(ctx.Value(contextSourceFileContent).(string))
-
-	_, err = io.Copy(out, stringReader)
+	err := remotes.CreateNewBranch(path)
 	if err != nil {
 		return err
 	}
 
-	return out.Close()
+	err = remotes.CommitAndPush(path, "test.json")
+	if err != nil {
+		return err
+	}
+
+	return nil
 
 }
 
@@ -102,16 +91,9 @@ func Sync(cfg *config.Config) {
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
 
-		// Create new branch
-		err = remotes.CreateNewBranch(target.Path)
-		if err != nil {
-			logger.Fatal(err)
-		}
+		fmt.Println(filepath.Base(targetFilePath))
 
-		err = remotes.CommitAndPush(target.Path, "test.json")
-		if err != nil {
-			logger.Fatal(err)
-		}
+		fmt.Println(os.Stat(targetFilePath))
 
 	}
 }
