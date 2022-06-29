@@ -16,6 +16,15 @@ type HolgersyncConfig struct {
 	Targets          []Target         `yaml:"Targets,mapstructure"`
 }
 
+type GlobalConfig struct {
+	GitHub GitHubConfig `yaml:"githubConfig"`
+}
+
+type GitHubConfig struct {
+	Username             string `yaml:"username"`
+	PersonaolAccessToken string `yaml:"personalAccessToken"`
+}
+
 type SourceFileConfig struct {
 	FilePath  string `yaml:"filePath"`
 	RootPath  string `yaml:"rootPath"`
@@ -23,8 +32,9 @@ type SourceFileConfig struct {
 }
 
 type Target struct {
-	Path       string      `yaml:"path"`
-	Parameters []Parameter `yaml:"parameters,mapstructure"`
+	Path       string       `yaml:"path"`
+	GitHub     GitHubConfig `yaml:"githubConfig"`
+	Parameters []Parameter  `yaml:"parameters,mapstructure"`
 }
 
 type Parameter struct {

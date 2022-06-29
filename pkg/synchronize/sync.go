@@ -1,14 +1,11 @@
 package synchronize
 
 import (
-	"bytes"
-	"context"
 	"errors"
 	"fmt"
-	"io"
+	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/helpers"
@@ -23,28 +20,19 @@ const (
 	contextSourceFileChecksum contextKey = "sourceFileChecksum"
 )
 
-func updateFile(rootPath string, path string, ctx context.Context) error {
+func pushToBackend(path string) error {
 
-	in, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	stringReader := strings.NewReader(ctx.Value(contextSourceFileContent).(string))
-
-	_, err = io.Copy(out, stringReader)
+	err := remotes.CreateNewBranch(path)
 	if err != nil {
 		return err
 	}
 
-	return out.Close()
+	err = remotes.CommitAndPush(path, "test.json")
+	if err != nil {
+		return err
+	}
+
+	return nil
 
 }
 
@@ -55,20 +43,11 @@ func Sync(cfg *config.Config) {
 	logger.InitLogger()
 	logger.Debug("Logger initialized")
 
-	configCtx := context.TODO()
-
 	// Read the content of the root file
 	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.SourceFileConfig.FilePath)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	configCtx = context.WithValue(configCtx, contextSourceFileContent, sourceFileContent)
-
-	sourceFileChecksum, err := helpers.CalcFileChecksum(sourceFileContent)
-	if err != nil {
-		logger.Fatal(err)
-	}
-	configCtx = context.WithValue(configCtx, contextSourceFileChecksum, sourceFileChecksum)
 
 	// Iterate over all targets
 	for _, target := range cfg.HolgersyncConfig.Targets {
@@ -81,37 +60,18 @@ func Sync(cfg *config.Config) {
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
 
-		sourceSha256, err := helpers.CalcFileChecksum(sourceFileContent)
-		if err != nil {
-			logger.Fatal(err)
-		}
-
 		targetContent, err := helpers.GetAbsPathAndReadFile(targetFilePath)
 		if err != nil {
 			logger.Fatal(err)
 		}
 
-		targetSha256, err := helpers.CalcFileChecksum(targetContent)
+		result, err := helpers.CompareData(sourceFileContent, targetContent)
 		if err != nil {
-			logger.Fatal(err)
+			log.Fatal(err)
 		}
-
-		res := bytes.Compare(sourceSha256, targetSha256)
-		if res != 0 {
+		if !result {
 			logger.Debugf("%s has changed. Updating", targetFilePath)
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
-
-		// Create new branch
-		err = remotes.CreateNewBranch(target.Path)
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		err = remotes.CommitAndPush(target.Path, "test.json")
-		if err != nil {
-			logger.Fatal(err)
-		}
-
 	}
 }

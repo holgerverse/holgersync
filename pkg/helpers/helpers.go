@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"io/ioutil"
 	"path/filepath"
@@ -22,6 +23,27 @@ func GetAbsPathAndReadFile(path string) ([]byte, error) {
 
 	return fileContent, nil
 
+}
+
+// Takes to strings and returns true if they are the same
+func CompareData(source []byte, target []byte) (bool, error) {
+
+	sourceSha256, err := CalcFileChecksum(source)
+	if err != nil {
+		return false, err
+	}
+
+	targetSha256, err := CalcFileChecksum(target)
+	if err != nil {
+		return false, err
+	}
+
+	res := bytes.Compare(sourceSha256, targetSha256)
+	if res != 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func CalcFileChecksum(data []byte) ([]byte, error) {
