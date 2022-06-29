@@ -1,26 +1,41 @@
 package remotes
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
-func CreateNewBranch(path string) error {
+func openRepositoryAndWorktree(path string) (*git.Repository, *git.Worktree, error) {
 
 	repo, err := git.PlainOpen(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	worktree, err := repo.Worktree()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return repo, worktree, nil
+}
+
+func CreateNewBranch(path string) error {
+
+	r, _, err := openRepositoryAndWorktree(path)
 	if err != nil {
 		return err
 	}
 
-	if branch, _ := repo.Branch("holgersync"); branch != nil {
+	if branch, _ := r.Branch("holgersync"); branch != nil {
 		return nil
 	}
 
-	err = repo.CreateBranch(&config.Branch{
+	err = r.CreateBranch(&config.Branch{
 		Name: "holgersync",
 	})
 	if err != nil {
@@ -32,12 +47,11 @@ func CreateNewBranch(path string) error {
 
 func CommitAndPush(path string, targetFile string) error {
 
-	repo, err := git.PlainOpen(path)
+	r, w, err := openRepositoryAndWorktree(path)
 	if err != nil {
 		return err
 	}
 
-	w, _ := repo.Worktree()
 	w.Add(targetFile)
 	w.Commit("hoglersync", &git.CommitOptions{})
 
@@ -46,9 +60,7 @@ func CommitAndPush(path string, targetFile string) error {
 		Password: os.Getenv("GITHUB_PERSONAL_ACCESSTOKEN"),
 	}
 
-	fmt.Println(auth)
-
-	err = repo.Push(&git.PushOptions{
+	err = r.Push(&git.PushOptions{
 		RemoteName: "origin",
 		Auth:       auth,
 	})
@@ -57,4 +69,23 @@ func CommitAndPush(path string, targetFile string) error {
 	}
 
 	return nil
+}
+
+func CheckFileStatusCode(path string, targetFile string) (*git.StatusCode, error) {
+
+	filePath := filepath.Join(path, targetFile)
+
+	_, w, err := openRepositoryAndWorktree(path)
+	if err != nil {
+		return nil, err
+	}
+
+	ws, err := w.Status()
+	if err != nil {
+		return nil, err
+	}
+
+	status := ws.File(filePath).Worktree
+
+	return &status, nil
 }
