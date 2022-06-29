@@ -17,4 +17,7 @@
 dist/
 /.vscode/
 holgersync.log
+
+
 tests/test**
+tests/holgersyncfile.yml
