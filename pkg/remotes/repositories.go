@@ -57,5 +57,4 @@ func CommitAndPush(path string, targetFile string) error {
 	}
 
 	return nil
-
 }
