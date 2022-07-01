@@ -3,38 +3,15 @@ package synchronize
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/helpers"
 	"github.com/holgerverse/holgersync/pkg/logger"
 	"github.com/holgerverse/holgersync/pkg/remotes"
 )
-
-type contextKey string
-
-const (
-	contextSourceFileContent  contextKey = "sourceFileContent"
-	contextSourceFileChecksum contextKey = "sourceFileChecksum"
-)
-
-func pushToBackend(path string) error {
-
-	err := remotes.CreateNewBranch(path)
-	if err != nil {
-		return err
-	}
-
-	err = remotes.CommitAndPush(path, "test.json")
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
 
 // Entrypoint for the synchronize command
 func Sync(cfg *config.Config) {
@@ -43,7 +20,7 @@ func Sync(cfg *config.Config) {
 	logger.InitLogger()
 	logger.Debug("Logger initialized")
 
-	// Read the content of the root file
+	// Read the content of the root fileBuildTargetConfig
 	sourceFileContent, err := helpers.GetAbsPathAndReadFile(cfg.HolgersyncConfig.SourceFileConfig.FilePath)
 	if err != nil {
 		logger.Fatal(err)
@@ -67,11 +44,36 @@ func Sync(cfg *config.Config) {
 
 		result, err := helpers.CompareData(sourceFileContent, targetContent)
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
-		if !result {
-			logger.Debugf("%s has changed. Updating", targetFilePath)
-			os.WriteFile(targetFilePath, sourceFileContent, 0644)
+
+		remote, err := remotes.CheckFileStatusCode(target.Path, filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath))
+		if err != nil {
+			logger.Fatal(err)
 		}
+
+		if result {
+			logger.Debugf("%s is up to date", targetFilePath)
+			break
+		}
+
+		if *remote == git.Unmodified {
+			logger.Debugf("%s is umodified.", targetFilePath)
+			break
+		}
+
+		logger.Debugf("%s has changed. Updating", targetFilePath)
+		os.WriteFile(targetFilePath, sourceFileContent, 0644)
+
+		err = remotes.CreateNewBranch(target.Path)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		err = remotes.CommitAndPush(target.Path, filepath.Base(targetFilePath))
+		if err != nil {
+			logger.Fatal(err)
+		}
+
 	}
 }
