@@ -13,16 +13,17 @@ type Config struct {
 
 type HolgersyncConfig struct {
 	SourceFileConfig SourceFileConfig `yaml:"sourceFileConfig"`
-	Targets          []Target         `yaml:"Targets,mapstructure"`
+	Targets          []Target         `mapstructure:"Targets"`
 }
 
 type GlobalConfig struct {
-	GitHub GitHubConfig `yaml:"githubConfig"`
+	Git []GitConfig `mapstructure:"gitConfig"`
 }
 
-type GitHubConfig struct {
-	Username             string `yaml:"username"`
-	PersonaolAccessToken string `yaml:"personalAccessToken"`
+type GitConfig struct {
+	Username            string `yaml:"username"`
+	PersonalAccessToken string `yaml:"personalAccessToken"`
+	Remote              string `yaml:"remote"`
 }
 
 type SourceFileConfig struct {
@@ -32,9 +33,9 @@ type SourceFileConfig struct {
 }
 
 type Target struct {
-	Path       string       `yaml:"path"`
-	GitHub     GitHubConfig `yaml:"githubConfig"`
-	Parameters []Parameter  `yaml:"parameters,mapstructure"`
+	Path       string      `yaml:"path"`
+	Git        []GitConfig `mapstructure:"gitConfig"`
+	Parameters []Parameter `mapstructure:"parameters"`
 }
 
 type Parameter struct {

@@ -3,4 +3,8 @@ HolgersyncConfig:
     filePath: tests/test.json
 
   Targets:
-  - path: tests/test_folder1
+  - path: tests/test_folder1/
+    gitConfig:
+    - username: holgerson97
+      personalAccessToken: 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
+    
