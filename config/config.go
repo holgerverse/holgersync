@@ -3,6 +3,8 @@ package config
 import (
 	"log"
 
+	"github.com/go-git/go-git/v5"
+	gitconfig "github.com/go-git/go-git/v5/config"
 	"github.com/spf13/viper"
 )
 
@@ -24,6 +26,7 @@ type GitConfig struct {
 	Username            string `yaml:"username"`
 	PersonalAccessToken string `yaml:"personalAccessToken"`
 	Remote              string `yaml:"remote"`
+	Branch              string `yaml:"branch"`
 }
 
 type SourceFileConfig struct {
@@ -74,4 +77,46 @@ func ParseConfig(v *viper.Viper) *Config {
 	}
 
 	return &c
+}
+
+func (t *Target) openRepositoryAndWorktree() (*git.Repository, *git.Worktree, error) {
+
+	repo, err := git.PlainOpen(t.Path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	worktree, err := repo.Worktree()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return repo, worktree, nil
+}
+
+func (t *Target) CreateNewBranch() error {
+
+	r, _, err := t.openRepositoryAndWorktree()
+	if err != nil {
+		return err
+	}
+
+	for _, gitConfig := range t.Git {
+		if gitConfig.Branch == "" {
+			gitConfig.Branch = "holgersync"
+		}
+	}
+
+	if branch, _ := r.Branch("holgersync"); branch != nil {
+		return nil
+	}
+
+	err = r.CreateBranch(&gitconfig.Branch{
+		Name: "holgersync",
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
