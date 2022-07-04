@@ -1,10 +1,12 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/go-git/go-git/v5"
-	gitconfig "github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
+
 	"github.com/spf13/viper"
 )
 
@@ -94,28 +96,34 @@ func (t *Target) openRepositoryAndWorktree() (*git.Repository, *git.Worktree, er
 	return repo, worktree, nil
 }
 
-func (t *Target) CreateNewBranch() error {
+// Create the desired Holgersync branch, if the branch already exists do nothing
+func (t *Target) CreateHolgersyncBranch() error {
 
+	// Variable to store the branch name, will be "holgersync" if not specified
+	var b string = "holgersync"
+
+	// Open the repostiroy and worktree
 	r, _, err := t.openRepositoryAndWorktree()
 	if err != nil {
 		return err
 	}
 
-	for _, gitConfig := range t.Git {
-		if gitConfig.Branch == "" {
-			gitConfig.Branch = "holgersync"
-		}
-	}
+	// Create reference for hoglersync branch
+	branchName := plumbing.NewBranchReferenceName(b)
 
-	if branch, _ := r.Branch("holgersync"); branch != nil {
-		return nil
-	}
-
-	err = r.CreateBranch(&gitconfig.Branch{
-		Name: "holgersync",
-	})
+	// Get the reference to the HEAD of the repository
+	headRef, err := r.Head()
 	if err != nil {
 		return err
+	}
+
+	// Create refrence for the new branch pointing to the HEAD of the repository
+	ref := plumbing.NewHashReference(branchName, headRef.Hash())
+
+	// Create the new branch and write it to the repository
+	err = r.Storer.SetReference(ref)
+	if err != nil {
+		return fmt.Errorf("failed to create branch %s: %s", b, err)
 	}
 
 	return nil
