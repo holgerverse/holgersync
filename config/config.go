@@ -5,7 +5,9 @@ import (
 	"log"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 
 	"github.com/spf13/viper"
 )
@@ -127,4 +129,52 @@ func (t *Target) CreateHolgersyncBranch() error {
 	}
 
 	return nil
+
+}
+
+func (t *Target) CommitAndPush(file string) error {
+
+	for _, remote := range t.Git {
+
+		r, w, err := t.openRepositoryAndWorktree()
+		if err != nil {
+			return err
+		}
+
+		w.Add(file)
+		w.Commit("holgersync", &git.CommitOptions{})
+
+		auth := &http.BasicAuth{
+			Username: remote.Username,
+			Password: remote.PersonalAccessToken,
+		}
+
+		err = r.Push(&git.PushOptions{
+			RefSpecs:   []config.RefSpec{"refs/heads/holgersync:refs/heads/holgersync"},
+			RemoteName: remote.Remote,
+			Auth:       auth,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to push to remote %s: %s", remote.Remote, err)
+		}
+	}
+
+	return nil
+}
+
+func (t *Target) CheckFileStatusCode(filePath string) (*git.StatusCode, error) {
+
+	_, w, err := t.openRepositoryAndWorktree()
+	if err != nil {
+		return nil, err
+	}
+
+	ws, err := w.Status()
+	if err != nil {
+		return nil, err
+	}
+
+	status := ws.File(filePath).Worktree
+
+	return &status, nil
 }
