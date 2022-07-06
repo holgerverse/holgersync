@@ -1,12 +1,13 @@
 package remotes
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
+	gitconfig "github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
+
+	"github.com/holgerverse/holgersync/config"
 )
 
 func openRepositoryAndWorktree(path string) (*git.Repository, *git.Worktree, error) {
@@ -35,7 +36,7 @@ func CreateNewBranch(path string) error {
 		return nil
 	}
 
-	err = r.CreateBranch(&config.Branch{
+	err = r.CreateBranch(&gitconfig.Branch{
 		Name: "holgersync",
 	})
 	if err != nil {
@@ -45,7 +46,7 @@ func CreateNewBranch(path string) error {
 	return nil
 }
 
-func CommitAndPush(path string, targetFile string) error {
+func CommitAndPush(path string, targetFile string, target config.Target) error {
 
 	r, w, err := openRepositoryAndWorktree(path)
 	if err != nil {
@@ -56,8 +57,8 @@ func CommitAndPush(path string, targetFile string) error {
 	w.Commit("hoglersync", &git.CommitOptions{})
 
 	auth := &http.BasicAuth{
-		Username: os.Getenv("GITHUB_USERNAME"),
-		Password: os.Getenv("GITHUB_PERSONAL_ACCESSTOKEN"),
+		Username: target.Git[0].Username,
+		Password: target.Git[0].PersonalAccessToken,
 	}
 
 	err = r.Push(&git.PushOptions{
