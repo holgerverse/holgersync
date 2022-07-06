@@ -6,5 +6,6 @@ HolgersyncConfig:
   - path: tests/test_folder1/
     gitConfig:
     - username: holgerson97
-      personalAccessToken: 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
-    
+      personalAccessToken: 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
+      remote: origin
+              
