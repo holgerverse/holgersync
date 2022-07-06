@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-git/go-git"
+	"github.com/go-git/go-git/v5"
 	"github.com/holgerverse/holgersync/config"
 	"github.com/holgerverse/holgersync/pkg/helpers"
 	"github.com/holgerverse/holgersync/pkg/logger"
@@ -46,13 +46,9 @@ func Sync(cfg *config.Config) {
 			logger.Fatal(err)
 		}
 
-		status, err := target.CheckFileStatusCode(filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath))
+		status, err := target.CheckFileStatusCode(targetFilePath)
 		if err != nil {
 			logger.Fatal(err)
-		}
-
-		if result {
-			logger.Debugf("%s is up to date", targetFilePath)
 		}
 
 		switch *status {
@@ -60,6 +56,13 @@ func Sync(cfg *config.Config) {
 			logger.Debugf("%s is up to date.", targetFilePath)
 		case git.Untracked, git.Modified:
 			logger.Debugf("%s needs to be commited and pushed.", targetFilePath)
+		}
+
+		if !result {
+			logger.Debugf("%s has changed. Updating", targetFilePath)
+			os.WriteFile(targetFilePath, sourceFileContent, 0644)
+		} else {
+			logger.Debugf("%s is up to date", targetFilePath)
 		}
 
 		//Create a new branch for the target
@@ -70,11 +73,8 @@ func Sync(cfg *config.Config) {
 
 	}
 
-	
-
 	// 	logger.Debugf("%s has changed. Updating", targetFilePath)
 	// 	os.WriteFile(targetFilePath, sourceFileContent, 0644)
-
 
 	// 	err = remotes.CommitAndPush(target.Path, filepath.Base(targetFilePath), target)
 	// 	if err != nil {
