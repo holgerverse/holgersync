@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 	"log"
-	"path/filepath"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 
@@ -150,20 +150,19 @@ func (t *Target) CommitAndPush(file string) error {
 		}
 
 		err = r.Push(&git.PushOptions{
+			RefSpecs:   []config.RefSpec{"refs/heads/holgersync:refs/heads/holgersync"},
 			RemoteName: remote.Remote,
 			Auth:       auth,
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to push to remote %s: %s", remote.Remote, err)
 		}
 	}
 
 	return nil
 }
 
-func (t *Target) CheckFileStatusCode(file string) (*git.StatusCode, error) {
-
-	filePath := filepath.Join(t.Path, file)
+func (t *Target) CheckFileStatusCode(filePath string) (*git.StatusCode, error) {
 
 	_, w, err := t.openRepositoryAndWorktree()
 	if err != nil {

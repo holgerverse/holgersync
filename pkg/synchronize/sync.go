@@ -71,14 +71,9 @@ func Sync(cfg *config.Config) {
 			logger.Fatal(err)
 		}
 
+		err = target.CommitAndPush(targetFilePath)
+		if err != nil {
+			logger.Fatal(err)
+		}
 	}
-
-	// 	logger.Debugf("%s has changed. Updating", targetFilePath)
-	// 	os.WriteFile(targetFilePath, sourceFileContent, 0644)
-
-	// 	err = remotes.CommitAndPush(target.Path, filepath.Base(targetFilePath), target)
-	// 	if err != nil {
-	// 		logger.Fatal(err)
-	// 	}
-	// }
 }
