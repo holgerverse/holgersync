@@ -1,5 +1,7 @@
 .DEFAULT: help
 
+NUMBER_OF_TESTS = 10
+
 .PHONY: help
 help:
 	@echo 'Makefile for "holgersync" development.'
@@ -23,6 +25,10 @@ build-holgersync:
 go-get-dependencies:
 	go mod tidy
 
+.PHONY: create-test-env
+create-test-env:
+	sh scripts/create_test_env.sh $(NUMBER_OF_TESTS) $(GIT_USERNAME) $(GIT_PERSONAL_ACCESS_TOKEN)
+
 .PHONY: clean-tests
 clean-tests:
-	find -f tests/test_folder* | xargs rm -rf
+	find -f tests/* | xargs rm -rf
