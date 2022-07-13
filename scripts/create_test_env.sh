@@ -5,7 +5,7 @@ touch tests/holgersyncfile.yml
 cat <<EOT > tests/source_test.json
 {
    "name": "Foo",
-   "description": "Bar",
+   "description": "Bar"
 }
 EOT
 
@@ -20,7 +20,7 @@ EOT
 for ((i = 0; i < $1; i++)); do
 
    cat <<EOT >> tests/holgersyncfile.yml
-   - path: tests/tests/test_folder_$((i+1))
+   - path: tests/test_folder_$((i+1))
      gitConfig:
      - username: $2
        personalAccessToken: $3
