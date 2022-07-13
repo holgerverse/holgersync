@@ -2,6 +2,13 @@
 
 touch tests/holgersyncfile.yml
 
+cat <<EOT > tests/source_test.json
+{
+   "name": "Foo",
+   "description": "Bar",
+}
+EOT
+
 cat <<EOT > tests/holgersyncfile.yml
 HolgersyncConfig:
    SourceFileConfig:
