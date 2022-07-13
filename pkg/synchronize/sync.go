@@ -29,19 +29,14 @@ func Sync(cfg *config.Config) {
 	for _, target := range *targets {
 
 		logger.Debugf("Processing target: %s", target.Path)
-		targetFilePath := fmt.Sprintf("%s%s", target.Path, filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath))
+		targetFilePath := fmt.Sprintf("%s/%s", target.Path, filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath))
 
-		if _, err := os.Stat(target.Path + "/" + filepath.Base(cfg.HolgersyncConfig.SourceFileConfig.FilePath)); errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(targetFilePath); errors.Is(err, os.ErrNotExist) {
 			logger.Debugf("%s does not exist. Copying source content", targetFilePath)
 			os.WriteFile(targetFilePath, sourceFileContent, 0644)
 		}
 
-		targetContent, err := helpers.GetAbsPathAndReadFile(targetFilePath)
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		result, err := helpers.CompareData(sourceFileContent, targetContent)
+		result, err := helpers.CompareWithSource(targetFilePath, sourceFileContent)
 		if err != nil {
 			logger.Fatal(err)
 		}

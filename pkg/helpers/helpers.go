@@ -46,6 +46,21 @@ func CompareData(source []byte, target []byte) (bool, error) {
 	return true, nil
 }
 
+func CompareWithSource(path string, content []byte) (bool, error) {
+
+	newContent, err := GetAbsPathAndReadFile(path)
+	if err != nil {
+		return false, err
+	}
+
+	result, err := CompareData(content, newContent)
+	if err != nil {
+		return false, err
+	}
+
+	return result, nil
+}
+
 func CalcFileChecksum(data []byte) ([]byte, error) {
 
 	sum := sha256.Sum256(data)
