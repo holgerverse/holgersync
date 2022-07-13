@@ -11,6 +11,10 @@ help:
 	@echo '  build-holgersync              - Build the hoglersync application.'
 	@echo '  go-get-dependencies           - Get the dependencies for the holgersync application.'
 	@echo '  clean-tests                   - Clean all files created by tests.'
+	@echo '  create-test-env               - Create a test environment for the holgersync application.'
+	@echo '                                  - NUMBER_OF_TESTS is the number of test folders to be created.'
+	@echo '                                  - GIT_USERNAME is the Git username.'
+	@echo '                                  - GIT_PERSONAL_ACCESS_TOKEN is the git password/PAT.'
 
 .PHONY: run-holgersync-development
 run-sync-development:
