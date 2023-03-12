@@ -20,7 +20,7 @@ jobs:
 
       - run: git fetch --force --tags
 
-      - uses: goreleaser/goreleaser-action@v2
+      - uses: goreleaser/goreleaser-action@v4
         name: run-goreleaser
         with: 
           distribution: goreleaser
